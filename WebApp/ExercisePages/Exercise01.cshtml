@@ -1,8 +1,102 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 01");
+    var myname = Request.Form["dataentry"];
+    string choices = ""; //global variable
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+@if (IsPost)
+{
+    @*<div class="offset-1">
+            <p>ISPOST = true</p>
+        </div>*@
+    choices = "";
+    var thebutton = Request.Form["theButton"];
+    choices = Request.Form["MealGroup"];
+    if (thebutton.Equals("submit")) //submit button was pressed
+    {
+        if (string.IsNullOrEmpty(myname))
+        {
+            <div class="offset-1">
+                <p style="color:firebrick">Name required.</p>
+            </div>
+        }
+        else if (choices.IsEmpty())
+        {
+            <div class="offset-1">
+                <p style="color:firebrick">Select at least one meal item.</p>
+            </div>
+            choices = "";
+        }
+        else
+        {
+            if (!choices.IsEmpty())
+            {
+                <div class="offset-1">
+                    <p>Well: Hello there, @myname</p>
+                </div>
+                <div class="offset-1">
+                    <p>
+                        Selected meal item(s):
+                        <ul>
+                            @foreach (var mealItem in choices.Split(','))
+                            {
+                                <li>@mealItem</li>
+                            }
+                        </ul>
+                    </p>
+                </div>
+            }
+        }
+
+    }
+    else //reset button was pressed
+    {
+        myname = "";
+        @*
+            <div class="offset-1">
+                <p>You pressed the reset button</p>
+            </div>*@
+        choices = "";
+    }
+}
+else
+{
+    @*<div class="offset-1">
+            <p>IsPost = false</p>
+        </div>*@
+}
+
+<form id="theform" method="post">
+    <div class="row">
+        <div class="col-md-3">
+            <label id="label1" for="dataentry">Customer Name: </label>&nbsp;&nbsp;
+            <input type="text" id="dataentry" name="dataentry" value="@myname" /> @*Adding "value=@..." to the <input> allows the input to be retained on posts.*@
+        </div>
+        <div class="col-md-9">
+            <label id="lblMealGroup" for="dataentry"><strong>Choose your meal items </strong></label><br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Steak"
+                   @(Array.IndexOf(choices.Split(','), "Steak") >= 0 ? "checked" : "") />Steak<br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Seafood"
+                   @(Array.IndexOf(choices.Split(','), "Seafood") >= 0 ? "checked" : "") />Seafood<br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Vegetables"
+                   @(Array.IndexOf(choices.Split(','), "Vegetables") >= 0 ? "checked" : "") />Vegetables<br />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-3">
+            <button type="submit" id="theButton" name="theButton"
+                    value="submit" class="btn btn-primary">
+                Submit
+            </button>&nbsp;&nbsp;
+            <button type="submit" id="theButton" name="theButton"
+                    value="reset" class="btn btn-light">
+                Reset
+            </button>
+        </div>
+    </div>
+</form>
