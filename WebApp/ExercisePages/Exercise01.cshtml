@@ -33,23 +33,20 @@
         }
         else
         {
-            if (!choices.IsEmpty())
-            {
-                <div class="offset-1">
-                    <p>Well: Hello there, @myname</p>
-                </div>
-                <div class="offset-1">
-                    <p>
-                        Selected meal item(s):
-                        <ul>
-                            @foreach (var mealItem in choices.Split(','))
-                            {
-                                <li>@mealItem</li>
-                            }
-                        </ul>
-                    </p>
-                </div>
-            }
+             <div class="offset-1">
+                 <p>Well: Hello there, @myname</p>
+             </div>
+             <div class="offset-1">
+                 <p>
+                     Selected meal item(s):
+                     <ul>
+                         @foreach (var mealItem in choices.Split(','))
+                         {
+                             <li>@mealItem</li>
+                         }
+                     </ul>
+                 </p>
+             </div>
         }
 
     }
@@ -68,6 +65,8 @@ else
     @*<div class="offset-1">
             <p>IsPost = false</p>
         </div>*@
+    myname = "";
+    choices = "";
 }
 
 <form id="theform" method="post">
