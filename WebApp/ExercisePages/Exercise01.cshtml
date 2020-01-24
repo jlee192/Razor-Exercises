@@ -20,10 +20,10 @@
     {
         if (string.IsNullOrEmpty(myname) && choices.IsEmpty())
         {
-            <div class="offset-1">
+            <div>
                 <p style="color:firebrick">Name required.</p>
             </div>
-            <div class="offset-1">
+            <div>
                 <p style="color:firebrick">Select at least one meal item.</p>
             </div>
             choices = "";
@@ -32,25 +32,22 @@
         {
             if (string.IsNullOrEmpty(myname))
             {
-                <div class="offset-1">
+                <div>
                     <p style="color:firebrick">Name required.</p>
                 </div>
             }
             else if (choices.IsEmpty())
             {
-                <div class="offset-1">
+                <div>
                     <p style="color:firebrick">Select at least one meal item.</p>
                 </div>
                 choices = "";
             }
             else
             {
-                <div class="offset-1">
-                    <p>Hello there, @myname</p>
-                </div>
-                <div class="offset-1">
+                <div>
                     <p>
-                        Selected meal item(s):
+                        @myname, I see that you have the following meal entries: 
                         <ul>
                             @foreach (var mealItem in choices.Split(','))
                             {
@@ -105,7 +102,8 @@ else
                     value="submit" class="btn btn-primary">
                 Submit
             </button>&nbsp;&nbsp;
-            <button type="submit" id="theButton" name="theButton"
+            @*Do not use tpye: reset*@
+            <button type="submit" id="theButton" name="theButton" 
                     value="reset" class="btn btn-light">
                 Reset
             </button>
