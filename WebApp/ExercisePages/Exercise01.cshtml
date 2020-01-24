@@ -18,14 +18,11 @@
     choices = Request.Form["MealGroup"];
     if (thebutton.Equals("submit")) //submit button was pressed
     {
-        if (string.IsNullOrEmpty(myname))
+        if (string.IsNullOrEmpty(myname) && choices.IsEmpty())
         {
             <div class="offset-1">
                 <p style="color:firebrick">Name required.</p>
             </div>
-        }
-        else if (choices.IsEmpty())
-        {
             <div class="offset-1">
                 <p style="color:firebrick">Select at least one meal item.</p>
             </div>
@@ -33,30 +30,46 @@
         }
         else
         {
-             <div class="offset-1">
-                 <p>Well: Hello there, @myname</p>
-             </div>
-             <div class="offset-1">
-                 <p>
-                     Selected meal item(s):
-                     <ul>
-                         @foreach (var mealItem in choices.Split(','))
-                         {
-                             <li>@mealItem</li>
-                         }
-                     </ul>
-                 </p>
-             </div>
+            if (string.IsNullOrEmpty(myname))
+            {
+                <div class="offset-1">
+                    <p style="color:firebrick">Name required.</p>
+                </div>
+            }
+            else if (choices.IsEmpty())
+            {
+                <div class="offset-1">
+                    <p style="color:firebrick">Select at least one meal item.</p>
+                </div>
+                choices = "";
+            }
+            else
+            {
+                <div class="offset-1">
+                    <p>Hello there, @myname</p>
+                </div>
+                <div class="offset-1">
+                    <p>
+                        Selected meal item(s):
+                        <ul>
+                            @foreach (var mealItem in choices.Split(','))
+                            {
+                                <li>@mealItem</li>
+                            }
+                        </ul>
+                    </p>
+                </div>
+            }
         }
 
     }
     else //reset button was pressed
     {
-        myname = "";
         @*
             <div class="offset-1">
                 <p>You pressed the reset button</p>
             </div>*@
+        myname = "";
         choices = "";
     }
 }
