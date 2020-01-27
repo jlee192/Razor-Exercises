@@ -86,6 +86,12 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="WebMatrix.Data, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.Data.3.2.7\lib\net45\WebMatrix.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.WebData, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.WebData.3.2.7\lib\net45\WebMatrix.WebData.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -95,7 +101,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="ExercisePages\Exercise01.cshtml" />
-    <Content Include="ExercisePages\Exercise02.cshtml" />
+    <Content Include="ExercisePages\Exercise02_A.cshtml" />
     <Content Include="Ex01-04-Instructions.docx" />
     <Content Include="CPSC1517-Jan-2020 Planning Calendar-RLaw.doc" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -122,6 +128,8 @@
     <Content Include="Scripts\esm\popper-utils.min.js.map" />
     <Content Include="Scripts\esm\popper-utils.js.map" />
     <Content Include="ExercisePages\Exercise03.cshtml" />
+    <Content Include="ExercisePages\Exercise02_B.cshtml" />
+    <Content Include="ExercisePages\Exercise02_C.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />

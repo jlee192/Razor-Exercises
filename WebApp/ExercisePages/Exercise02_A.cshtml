@@ -1,0 +1,53 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = string.Format("Razor - {0}", "Exercise 02");
+
+    //output variable
+    string regionid = "";
+    string regiondescription = "";
+
+    //input variables for web controls
+    var regionarg = Request.Form["RegionArg"];
+    var thebutton = Request.Form["theButton"];
+
+    //remember the 1st time the page is called
+    //input variables will be null
+
+    if (string.IsNullOrEmpty(regionarg))
+    {
+        regionarg = "0";
+    }
+    //connect to the database
+    //use the name attribute off your web connection string
+    var db = Database.Open("CHINOOK");
+
+    //create the sql command to be executed on the database
+    //input parameters will be represented by the use of placeholders
+    //placeholder are indexes (0, 1, 2,...)
+    //your command can used multiple placeholders
+    //var sqlcommand = "SELECT RegionID, RegionDescription "
+    //                + "FROM Region "
+    //                + "WHERE RegionID = @0";
+
+    var sqlcommand = @"SELECT ArtistId  
+                        FROM Artists 
+                        WHERE Name like = @0";
+
+
+    //execute command
+    //there is 3 ways to execute a query DEPENDING on your expected results
+    //a) a single row   .QuerySingle(command [, list of argments])
+    //b) 0, 1 or more records   .Query(command [, list of argments])
+    //c) a single value   .QueryValue(command [, list of argments])
+    //the list of argments are your positional incoming argment values
+
+
+    //primary key lookup
+    //result should  be one record
+    var results = db.QuerySingle(sqlcommand, regionarg);
+}
+
+@section banner {
+    <h1>@Page.Title</h1>
+}
+
