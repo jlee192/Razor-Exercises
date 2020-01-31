@@ -1,8 +1,74 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
-    Page.Title = string.Format("Razor - {0}", "Exercise 02");
+    Page.Title = string.Format("Razor - {0}", "Exercise 02_B");
+
+    //output variable
+    string artistid = "";
+    string artistname = "";
+
+    //reteive the passed data value
+    //to retreive the passed data use .QueryString["label"]
+    //data is returned as a string
+    var cid = Request.QueryString["cid"];
+
+    //good practice
+    //check that you actually retreived data
+    if (string.IsNullOrEmpty(cid))
+    {
+        Response.Redirect("SimpleQueryLikePage1.cshtml");
+    }
+
+    var db = Database.Open("CHINOOK");
+
+    string sqlcommand1 = "SELECT ArtistId, Name FROM Artists WHERE Name LIKE @0 ORDER BY Name";
+    var partialstring = "%" + cid + "%";
+    var results = db.Query(sqlcommand1, partialstring);
+    if (results.Count() == 0)
+    {
+        <p style="color:firebrick">There was no record returned from the Data Base</p>
+    }
+    else
+    {
+        <p style="color:darkgreen">There was @results.Count() record/s returned from the Data Base</p>
+    }
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+@*
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Artist Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in results)
+            {
+                <tr>
+                    <td>@row.ArtistId</td>
+                    <td>@row.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
+
+<div class="row">
+    <div class="offset-1">
+        <label id="lblCodingSamples">Select from the list:</label>&nbsp;&nbsp;
+        <select id="CodingSamples" name="CodingSamples">
+            <option value="">select ...</option>
+            @foreach (var row in results)
+            {
+                <option value="artistid">@row.Name</option>
+            }
+        </select>&nbsp;&nbsp;
+        <button type="submit" id="theButton" name="theButton" value="submit"
+                class="btn btn-primary">
+            Fetch Album
+        </button>
+    </div>
+</div>
