@@ -15,7 +15,7 @@
     //check that you actually retreived data
     if (string.IsNullOrEmpty(cid))
     {
-        Response.Redirect("SimpleQueryLikePage1.cshtml");
+        Response.Redirect("Exercise02_A.cshtml");
     }
 
     var db = Database.Open("CHINOOK");
@@ -36,39 +36,22 @@
 @section banner {
     <h1>@Page.Title</h1>
 }
-@*
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Artist Name</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var row in results)
-            {
-                <tr>
-                    <td>@row.ArtistId</td>
-                    <td>@row.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>*@
 
-<div class="row">
-    <div class="offset-1">
-        <label id="lblCodingSamples">Select from the list:</label>&nbsp;&nbsp;
-        <select id="CodingSamples" name="CodingSamples">
-            <option value="">select ...</option>
-            @foreach (var row in results)
-            {
-                <option value="artistid">@row.Name</option>
-            }
-        </select>&nbsp;&nbsp;
-        <button type="submit" id="theButton" name="theButton" value="submit"
-                class="btn btn-primary">
-            Fetch Album
-        </button>
+<form id="theform" method="post">
+    <div class="row">
+        <div class="offset-1">
+            <label id="lblCodingSamples">Select from the list:</label>&nbsp;&nbsp;
+            <select id="CodingSamples" name="CodingSamples">
+                <option value="">select ...</option>
+                @foreach (var row in results)
+                {
+                    <option value="artistid">@row.Name</option>
+                }
+            </select>&nbsp;&nbsp;
+            <button type="submit" id="theButton" name="theButton" value="submit"
+                    class="btn btn-primary">
+                Fetch Album
+            </button>
+        </div>
     </div>
-</div>
+</form>
