@@ -11,47 +11,70 @@
     //data is returned as a string
     var cid = Request.QueryString["cid"];
 
-    //good practice
-    //check that you actually retreived data
-    if (string.IsNullOrEmpty(cid))
-    {
-        Response.Redirect("Exercise02_A.cshtml");
-    }
-
     var db = Database.Open("CHINOOK");
 
     string sqlcommand1 = "SELECT ArtistId, Name FROM Artists WHERE Name LIKE @0 ORDER BY Name";
     var partialstring = "%" + cid + "%";
     var results = db.Query(sqlcommand1, partialstring);
-    if (results.Count() == 0)
-    {
-        <p style="color:firebrick">There was no record returned from the Data Base</p>
-    }
-    else
-    {
-        <p style="color:darkgreen">There was @results.Count() record/s returned from the Data Base</p>
-    }
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
 
+@if (IsPost)
+{
+    //obtain my data from the form
+    var choice = Request.Form["CategoryList"];
+
+    //check for a selection
+    if (choice.Equals("0"))
+    {
+        <p style="color:firebrick">Select artist:</p>
+    }
+    else
+    {
+        var prodquery = @"SELECT Name
+                        FROM Artists
+                        WHERE ArtistId = @0";
+        var prodinfo = db.Query(prodquery, choice);
+        //      check to see if there are products for category
+        if (prodinfo.Count() == 0)
+        {
+            <p style="color:firebrick">There are no albums for the selected artist.</p>
+        }
+        else
+        {
+            Response.Redirect("Exercise02_C.cshtml?cid=" + choice);
+        }
+    }
+}
+else
+{
+    //on page initialization (1st time)
+    //testing for an empty collection uses the .Count() method
+    //the .Query() command will give you a collection of 0, 1 or more records
+    if (results.Count() == 0)
+    {
+        <p style="color:firebrick">There are no categories on file.</p>
+    }
+}
+
 <form id="theform" method="post">
-    <div class="row">
-        <div class="offset-1">
-            <label id="lblCodingSamples">Select from the list:</label>&nbsp;&nbsp;
-            <select id="CodingSamples" name="CodingSamples">
-                <option value="">select ...</option>
-                @foreach (var row in results)
-                {
-                    <option value="artistid">@row.Name</option>
-                }
-            </select>&nbsp;&nbsp;
-            <button type="submit" id="theButton" name="theButton" value="submit"
-                    class="btn btn-primary">
-                Fetch Album
-            </button>
-        </div>
+    <div class="offset-3">
+        <label id="lblCategoryList" for="CategoryList">Select Artist:</label>
+        &nbsp;&nbsp;
+        <select id="CategoryList" name="CategoryList">
+            <option value="0">select ....</option>
+            @foreach (var item in results)
+            {
+                <option value="@item.ArtistId">@item.Name</option>
+            }
+        </select>
+        &nbsp;&nbsp;
+        <button type="submit" id="theButton" name="theButton" value="submit"
+                class="btn btn-primary">
+            Fetch Album
+        </button>
     </div>
 </form>

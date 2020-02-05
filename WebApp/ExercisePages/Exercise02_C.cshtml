@@ -1,8 +1,53 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 02_C");
+
+    //reteive the passed data value
+    //to retreive the passed data use .QueryString["label"]
+    //data is returned as a string
+    var cid = Request.QueryString["cid"];
+    //<p>Your choice was: @cid</p>
+    //good practice
+    //check that you actually retreived data
+    if (string.IsNullOrEmpty(cid))
+    {
+        Response.Redirect("Exercise02_B.cshtml");
+    }
+
+    //use data to lookup products
+    var db = Database.Open("CHINOOK");
+
+    var prodquery = @"SELECT AlbumId, Title, ReleaseYear, ReleaseLabel
+                   FROM Albums
+                   WHERE ArtistId = @0";
+
+    var prodinfo = db.Query(prodquery, cid);
+
+    var catquery =  @"SELECT Name
+                    FROM Artists
+                    WHERE ArtistId = @0";
+
+    var catname = db.QueryValue(catquery, cid);
+
+    var gridinstance = new WebGrid(prodinfo, rowsPerPage: 10);
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+<div class="offset-1">
+    <h3>Albums of @catname</h3>
+    <div class="col-11">
+        @gridinstance.GetHtml(
+            tableStyle: "table table-striped table-bordered table-hover",
+            mode: WebGridPagerModes.All,
+            firstText: "Start",
+            lastText: "Ends",
+            columns: gridinstance.Columns(
+               gridinstance.Column(columnName: "AlbumId", header: "ID"),
+               gridinstance.Column(columnName: "Title", header: "Title"),
+               gridinstance.Column(columnName: "ReleaseYear", header: "Released"),
+               gridinstance.Column(columnName: "ReleaseLabel", header: "Label"))
+            )
+    </div>
+</div>
