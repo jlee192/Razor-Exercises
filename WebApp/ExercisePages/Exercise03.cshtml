@@ -1,8 +1,129 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 03");
+
+    // global variables
+    var title = "";
+    var artistid = "0";
+    var releaseyear = "0";
+    var releaselabel = "";
+
+    // Obtain a list
+    var db = Database.Open("CHINOOK");
+    var sqlquery = @"SELECT ArtistId, Name FROM Artists ORDER BY Name";
+    var sqlquerylist = db.Query(sqlquery);
+
+    // validator controls; execute on the server side
+    Validation.Add("Title",
+        Validator.Required("Title is required"),
+        Validator.StringLength(160, 1, "Title name is limited to 160 characters"));
+    Validation.Add("ArtistId",
+        Validator.Integer("Artist ID must be an integer"),
+        Validator.Required("Artist ID is required"));
+    Validation.Add("ReleaseYear",
+        Validator.Required("Release year is required"),
+        Validator.Integer("Release year must be a number"),
+        Validator.Range(DateTime.Today.Year, 1950, "Between 1950 and this year inclusive"));
+    Validation.Add("ReleaseLabel",
+        Validator.StringLength(50, 1, "Max 50 characters"));
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+
+@if (IsPost)
+{
+    // retrieve the data from the form
+    title = Request.Form["Title"];
+    artistid = Request.Form["ArtistId"];
+    releaseyear = Request.Form["ReleaseYear"];
+    releaselabel = Request.Form["ReleaseLabel"];
+    var thebutton = Request.Form["FormButton"];
+
+    if (thebutton.Equals("Clear"))
+    {
+        // empty the form fields
+        title = ""; // string
+        artistid = "0"; // int
+        releaseyear = "0"; // int
+        releaselabel = ""; // string
+    }
+    else
+    {
+        if (Validation.IsValid())
+        {
+            var valid = true;
+            if (artistid.Equals("0"))
+            {
+                valid = false;
+                <div class="col-12 text-center">
+                    <p style="color:darkslateblue">
+                        You must select artist id
+                    </p>
+                </div>
+            }
+            if (valid)
+            {
+                try
+                {
+                    // create sql command
+                    var inscommand = @"INSERT INTO Albums (Title, ArtistId, ReleaseYear, ReleaseLabel)
+                VALUES(@0, @1, @2, @3)";
+                    // execute the command
+                    db.Execute(inscommand, title,
+                        artistid.Equals("0") ? null : artistid,
+                        string.IsNullOrEmpty(title) ? null : title,
+                        string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
+                        string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
+                    <div class="col-12 text-center">
+                        <p style="color:green">
+                            Album has been added
+                        </p>
+                    </div>
+                }
+                catch (Exception ex)
+                {
+                    <div class="col-12 text-center">
+                        <p style="color:firebrick; font-size:large">
+                            Processing error: @ex.Message
+                        </p>
+                    </div>
+                }
+            }
+        }
+    }
+}
+
+@Html.ValidationSummary()
+<form id="theform" method="post">
+    <div class="row">
+        <div class="col-md-6 text-right">
+        </div>
+        <div class="col-md-6 text-left">
+
+            <label for="Title"><strong>Title:</strong></label>
+            <input type="text" value="@title"
+                   id="Title" name="Title" required />
+            <br />
+
+            <label for="ArtistId"><strong>Artist:</strong></label>
+            <select id="ArtistList" name="ArtistList">
+                <option value="0">select...</option>
+                @foreach (var item in sqlquerylist)
+                {
+                    if (artistid == item.ArtistId.ToString())
+                    {
+                        <option value="@item.ArtistId" selected>@item.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@item.ArtistId">@item.Name</option>
+                    }
+                }
+            </select>
+            <br />
+
+        </div>
+    </div>
+</form>
