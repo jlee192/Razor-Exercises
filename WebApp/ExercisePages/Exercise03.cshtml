@@ -5,7 +5,7 @@
     // global variables
     var title = "";
     var artistid = "0";
-    var releaseyear = "0";
+    var releaseyear = "";
     var releaselabel = "";
 
     // Obtain a list
@@ -23,9 +23,10 @@
     Validation.Add("ReleaseYear",
         Validator.Required("Release year is required"),
         Validator.Integer("Release year must be a number"),
-        Validator.Range(DateTime.Today.Year, 1950, "Between 1950 and this year inclusive"));
+        Validator.Range(1950, DateTime.Now.Year, "Year is out of range, 1950 to today"));
     Validation.Add("ReleaseLabel",
-        Validator.StringLength(50, 1, "Max 50 characters"));
+        //Validator.StringLength(50, 1, "Max 50 characters"));
+        Validator.StringLength(50, 0, "Label is limited to 50 characters."));
 }
 
 @section banner {
@@ -46,79 +47,93 @@
         // empty the form fields
         title = ""; // string
         artistid = "0"; // int
-        releaseyear = "0"; // int
+        releaseyear = ""; // int
         releaselabel = ""; // string
     }
-    else
+    else // pressed the ADD button
     {
         if (Validation.IsValid())
         {
-            var valid = true;
-            if (artistid.Equals("0"))
+            @*var valid = true;
+                if (artistid.Equals("0"))
+                {
+                    valid = false;
+                    <div class="col-12 text-center">
+                        <p style="color:darkslateblue">
+                            You must select artist id
+                        </p>
+                    </div>
+                }
+                if (valid)
+                {*@
+            try
             {
-                valid = false;
+                // create sql command
+                var inscommand = "INSERT INTO Albums "
+                    + "(Title, ArtistId, ReleaseYear, ReleaseLabel) "
+                    + "VALUES(@0, @1, @2, @3, 0)";
+                // execute the command
+                db.Execute(inscommand, title,
+                    artistid.Equals("0") ? null : artistid,
+                    string.IsNullOrEmpty(title) ? null : title,
+                    string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
+                    string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
                 <div class="col-12 text-center">
-                    <p style="color:darkslateblue">
-                        You must select artist id
+                    <p style="color:green">
+                        Album has been added
                     </p>
                 </div>
             }
-            if (valid)
+            catch (Exception ex)
             {
-                try
-                {
-                    // create sql command
-                    var inscommand = @"INSERT INTO Albums (Title, ArtistId, ReleaseYear, ReleaseLabel)
-                VALUES(@0, @1, @2, @3)";
-                    // execute the command
-                    db.Execute(inscommand, title,
-                        artistid.Equals("0") ? null : artistid,
-                        string.IsNullOrEmpty(title) ? null : title,
-                        string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
-                        string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
-                    <div class="col-12 text-center">
-                        <p style="color:green">
-                            Album has been added
-                        </p>
-                    </div>
-                }
-                catch (Exception ex)
-                {
-                    <div class="col-12 text-center">
-                        <p style="color:firebrick; font-size:large">
-                            Processing error: @ex.Message
-                        </p>
-                    </div>
-                }
+                <div class="col-12 text-center">
+                    <p style="color:firebrick; font-size:large">
+                        Processing error: @ex.Message
+                    </p>
+                </div>
             }
+            //}
         }
     }
+}
+else
+{
+    // empty the form fields
+        title = ""; // string
+        artistid = "0"; // int
+        releaseyear = ""; // int
+        releaselabel = ""; // string
 }
 
 @Html.ValidationSummary()
 <form id="theform" method="post">
-    <div class="row">
-        <div class="col-6 text-right">
 
-            <label for="Title"><strong>Title:</strong></label>
+    <div class="row">
+        @*This row contains the fields*@
+        <div class="col-6 text-right">
+            <label id="lblTitle" for="Title">Title:</label>
+        </div>
+        <div class="col-6 text-left">
             <input type="text" value="@title"
                    id="Title" name="Title" required />
             <br />
         </div>
 
+        <div class="col-6 text-right">
+            <label id="lblArtist" for="Artist">Artist:</label>
+        </div>
         <div class="col-6 text-left">
-            <label for="ArtistId"><strong>Artist:</strong></label>
             <select id="ArtistList" name="ArtistList">
                 <option value="0">select...</option>
                 @foreach (var item in sqlquerylist)
                 {
-                    if (artistid == item.ArtistId.ToString())
+                    if (item.ArtistId.ToString() == artistid)
                     {
-                        <option value="@item.ArtistId" selected>@item.Name</option>
+                        <option value="@item[0]" selected>@item[1]</option>
                     }
                     else
                     {
-                        <option value="@item.ArtistId">@item.Name</option>
+                        <option value="@item[0]">@item[1]</option>
                     }
                 }
             </select>
@@ -126,17 +141,23 @@
         </div>
 
         <div class="col-6 text-right">
-            <label for="ReleaseYear"><strong>Year:</strong></label>
-            <input type="text" value="@releaseyear"
+            <label id="lblReleaseYear" for="ReleaseYear">Year:</label>
+        </div>
+        <div class="col-6 text-left">
+            <input type="number" value="@releaseyear"
                    id="ReleaseYear" name="ReleaseYear" required />
         </div>
 
-        <div class="col-6 text-left">
-            <label for="ReleaseLabel"><strong>Label:</strong></label>
-            <input type="text" value="@releaselabel"
-                   id="ReleaseLabel" name="ReleaseLabel" required />
+        <div class="col-6 text-right">
+            <label id="lblReleaseLabel" for="ReleaseLabel">Label:</label>
         </div>
+        <div class="col-6 text-left">
+            <input type="text" value="@releaselabel"
+                   id="ReleaseLabel" name="ReleaseLabel" />
+        </div>
+
     </div>
+    @*This row contains the submit/clear buttons*@
     <div class="row">
         <div class="col-12 text-center">
             <input type="submit" id="FormButton" name="FormButton"
@@ -145,10 +166,6 @@
                    class="btn" value="Clear" />
         </div>
     </div>
+
 </form>
 
-<div class="row">
-    <div class="col-6 text-right">
-        @Html.ValidationSummary()
-    </div>
-</div>
