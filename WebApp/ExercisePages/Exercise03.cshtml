@@ -10,20 +10,23 @@
 
     // Obtain a list
     var db = Database.Open("CHINOOK");
-    var sqlquery = @"SELECT ArtistId, Name FROM Artists ORDER BY Name";
-    var sqlquerylist = db.Query(sqlquery);
+    var artistquery = @"SELECT ArtistId, Name FROM Artists ORDER BY ArtistId";
+    var artistlist = db.Query(artistquery);
 
     // validator controls; execute on the server side
     Validation.Add("Title",
         Validator.Required("Title is required"),
         Validator.StringLength(160, 1, "Title name is limited to 160 characters"));
-    Validation.Add("ArtistId",
-        Validator.Integer("Artist ID must be an integer"),
-        Validator.Required("Artist ID is required"));
+
+    //Validation.Add("ArtistId",
+    //    Validator.Integer("Artist ID must be an integer"),
+    //    Validator.Required("Artist must be selected"));
+
     Validation.Add("ReleaseYear",
         Validator.Required("Release year is required"),
         Validator.Integer("Release year must be a number"),
         Validator.Range(1950, DateTime.Now.Year, "Year is out of range, 1950 to today"));
+
     Validation.Add("ReleaseLabel",
         //Validator.StringLength(50, 1, "Max 50 characters"));
         Validator.StringLength(50, 0, "Label is limited to 50 characters."));
@@ -37,7 +40,7 @@
 {
     // retrieve the data from the form
     title = Request.Form["Title"];
-    artistid = Request.Form["ArtistId"];
+    artistid = Request.Form["ArtistList"];
     releaseyear = Request.Form["ReleaseYear"];
     releaselabel = Request.Form["ReleaseLabel"];
     var thebutton = Request.Form["FormButton"];
@@ -71,10 +74,11 @@
                 // create sql command
                 var inscommand = "INSERT INTO Albums "
                     + "(Title, ArtistId, ReleaseYear, ReleaseLabel) "
-                    + "VALUES(@0, @1, @2, @3, 0)";
+                    + "VALUES(@0, @1, @2, @3)";
                 // execute the command
                 db.Execute(inscommand, title,
                     artistid.Equals("0") ? null : artistid,
+                    string.IsNullOrEmpty(artistid.ToString()) ? null : artistid,
                     string.IsNullOrEmpty(title) ? null : title,
                     string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
                     string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
@@ -98,11 +102,11 @@
 }
 else
 {
-    // empty the form fields
-        title = ""; // string
-        artistid = "0"; // int
-        releaseyear = ""; // int
-        releaselabel = ""; // string
+    //// empty the form fields
+    //    title = ""; // string
+    //    artistid = "0"; // int
+    //    releaseyear = ""; // int
+    //    releaselabel = ""; // string
 }
 
 @Html.ValidationSummary()
@@ -114,38 +118,36 @@ else
             <label id="lblTitle" for="Title">Title:</label>
         </div>
         <div class="col-6 text-left">
-            <input type="text" value="@title"
-                   id="Title" name="Title" required />
-            <br />
-        </div>
+            <input type="text" name="Title" value="@title" />
+        </div><br />
+
 
         <div class="col-6 text-right">
-            <label id="lblArtist" for="Artist">Artist:</label>
+            <label id="lblArtistList" for="ArtistList">Artist:</label>
         </div>
         <div class="col-6 text-left">
-            <select id="ArtistList" name="ArtistList">
+            <select name="ArtistList">
                 <option value="0">select...</option>
-                @foreach (var item in sqlquerylist)
+                @foreach (var acollectionrow in artistlist)
                 {
-                    if (item.ArtistId.ToString() == artistid)
+                    if (acollectionrow.ArtistId.ToString() == artistid)
                     {
-                        <option value="@item[0]" selected>@item[1]</option>
+                        <option value="@acollectionrow[0]" selected>@acollectionrow[1]</option>
                     }
                     else
                     {
-                        <option value="@item[0]">@item[1]</option>
+                        <option value="@acollectionrow[0]">@acollectionrow[1]</option>
                     }
                 }
             </select>
-            <br />
-        </div>
+        </div><br />
 
         <div class="col-6 text-right">
             <label id="lblReleaseYear" for="ReleaseYear">Year:</label>
         </div>
         <div class="col-6 text-left">
             <input type="number" value="@releaseyear"
-                   id="ReleaseYear" name="ReleaseYear" required />
+                   id="ReleaseYear" name="ReleaseYear" />
         </div>
 
         <div class="col-6 text-right">
