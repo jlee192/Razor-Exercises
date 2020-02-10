@@ -69,19 +69,19 @@
                 }
                 if (valid)
                 {*@
-            try
-            {
-                // create sql command
-                var inscommand = "INSERT INTO Albums "
-                    + "(Title, ArtistId, ReleaseYear, ReleaseLabel) "
-                    + "VALUES(@0, @1, @2, @3)";
-                // execute the command
-                db.Execute(inscommand, title,
-                    artistid.Equals("0") ? null : artistid,
-                    string.IsNullOrEmpty(artistid.ToString()) ? null : artistid,
-                    string.IsNullOrEmpty(title) ? null : title,
-                    string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
-                    string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
+try
+{
+    // create sql command
+    var inscommand = "INSERT INTO Albums "
+        + "(Title, ArtistId, ReleaseYear, ReleaseLabel) "
+        + "VALUES(@0, @1, @2, @3)";
+    // execute the command
+    db.Execute(inscommand, title,
+        artistid.Equals("0") ? null : artistid,
+        //string.IsNullOrEmpty(artistid.ToString()) ? null : artistid,
+        //string.IsNullOrEmpty(title) ? null : title,
+        string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
+        string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
                 <div class="col-12 text-center">
                     <p style="color:green">
                         Album has been added
@@ -112,20 +112,28 @@ else
 @Html.ValidationSummary()
 <form id="theform" method="post">
 
+    @*Pseudo-header*@
+    <div>
+        <font size="+2">
+            <p><strong>Enter Album</strong></p>
+        </font>
+    </div>
+
     <div class="row">
+
         @*This row contains the fields*@
-        <div class="col-6 text-right">
+        <div class="col-1 text-right">
             <label id="lblTitle" for="Title">Title:</label>
         </div>
-        <div class="col-6 text-left">
+        <div class="col-11 text-left">
             <input type="text" name="Title" value="@title" />
         </div><br />
 
 
-        <div class="col-6 text-right">
+        <div class="col-1 text-right">
             <label id="lblArtistList" for="ArtistList">Artist:</label>
         </div>
-        <div class="col-6 text-left">
+        <div class="col-11 text-left">
             <select name="ArtistList">
                 <option value="0">select...</option>
                 @foreach (var acollectionrow in artistlist)
@@ -142,18 +150,18 @@ else
             </select>
         </div><br />
 
-        <div class="col-6 text-right">
+        <div class="col-1 text-right">
             <label id="lblReleaseYear" for="ReleaseYear">Year:</label>
         </div>
-        <div class="col-6 text-left">
+        <div class="col-11 text-left">
             <input type="number" value="@releaseyear"
                    id="ReleaseYear" name="ReleaseYear" />
         </div>
 
-        <div class="col-6 text-right">
+        <div class="col-1 text-right">
             <label id="lblReleaseLabel" for="ReleaseLabel">Label:</label>
         </div>
-        <div class="col-6 text-left">
+        <div class="col-11 text-left">
             <input type="text" value="@releaselabel"
                    id="ReleaseLabel" name="ReleaseLabel" />
         </div>
