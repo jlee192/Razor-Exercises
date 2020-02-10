@@ -98,16 +98,15 @@
 @Html.ValidationSummary()
 <form id="theform" method="post">
     <div class="row">
-        <div class="col-md-6 text-right">
-            <label for="Header">Enter Album</label>
-        </div>
-        <div class="col-md-6 text-left">
+        <div class="col-6 text-right">
 
             <label for="Title"><strong>Title:</strong></label>
             <input type="text" value="@title"
                    id="Title" name="Title" required />
             <br />
+        </div>
 
+        <div class="col-6 text-left">
             <label for="ArtistId"><strong>Artist:</strong></label>
             <select id="ArtistList" name="ArtistList">
                 <option value="0">select...</option>
@@ -124,15 +123,26 @@
                 }
             </select>
             <br />
+        </div>
 
+        <div class="col-6 text-right">
             <label for="ReleaseYear"><strong>Year:</strong></label>
             <input type="text" value="@releaseyear"
                    id="ReleaseYear" name="ReleaseYear" required />
+        </div>
 
+        <div class="col-6 text-left">
             <label for="ReleaseLabel"><strong>Label:</strong></label>
             <input type="text" value="@releaselabel"
                    id="ReleaseLabel" name="ReleaseLabel" required />
-
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 text-center">
+            <input type="submit" id="FormButton" name="FormButton"
+                   class="btn btn-primary" value="Add" />
+            <input type="submit" id="FormButton" name="FormButton" formnovalidate
+                   class="btn" value="Clear" />
         </div>
     </div>
 </form>
