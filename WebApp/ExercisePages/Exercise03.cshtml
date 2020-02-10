@@ -99,6 +99,7 @@
 <form id="theform" method="post">
     <div class="row">
         <div class="col-md-6 text-right">
+            <label for="Header">Enter Album</label>
         </div>
         <div class="col-md-6 text-left">
 
@@ -124,6 +125,20 @@
             </select>
             <br />
 
+            <label for="ReleaseYear"><strong>Year:</strong></label>
+            <input type="text" value="@releaseyear"
+                   id="ReleaseYear" name="ReleaseYear" required />
+
+            <label for="ReleaseLabel"><strong>Label:</strong></label>
+            <input type="text" value="@releaselabel"
+                   id="ReleaseLabel" name="ReleaseLabel" required />
+
         </div>
     </div>
 </form>
+
+<div class="row">
+    <div class="col-6 text-right">
+        @Html.ValidationSummary()
+    </div>
+</div>
