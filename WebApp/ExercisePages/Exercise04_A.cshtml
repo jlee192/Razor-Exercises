@@ -1,37 +1,50 @@
 ﻿@{
-    // this will be based on ProductEdit.cshtml 
+    // this will be based on ProductSearch.cshtml
 
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 04_A");
 
-    var pid = Request.QueryString["pid"];
-    if (pid.IsEmpty())
-    {
-        Response.Redirect("Exercise04_B.cshtml");
-    }
-    var albumid = Request.Form["AlbumId"];
-    var title = Request.Form["Title"];
-    var artistid = Request.Form["ArtistList"];
-    var releaseyear = Request.Form["ReleaseYear"];
-    var releaselabel = Request.Form["ReleaseLabel"];
+    var albumsearch = Request.Form["AlbumSearch"];
 
-    // validator controls which execute on the server side
-    Validation.Add("Title",
-        Validator.Required("Album title is required"),
-        Validator.StringLength(160,1,"Album title is limited to 160 characters"));
+    var db = Database.Open("CHINOOK");
+    //var partialsearchstring = "%" + albumsearch + "%";
 
-    Validation.Add("ArtistList",
-        Validator.Required("Artist must be selected"));
-
-    Validation.Add("ReleaseYear",
-        Validator.Required("Release year is required"),
-        Validator.Integer("Release year must be a number"),
-        Validator.Range(1950, DateTime.Now.Year, "Year is out of range, 1950 to today"));
-
-    Validation.Add("ReleaseLabel",
-        Validator.StringLength(50, 0, "Label is limited to 50 characters."));
+    var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
+    var queryProducts = db.Query(queryStatement, albumsearch);
+    //var queryProducts = db.Query(queryStatement, partialsearchstring);
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+
+<form id="theForm" action="" method="post">
+    <div class="col-sm-3">
+        <label id="forAlbumSearch">Album ID</label><br />
+        <input type="text" name="AlbumSearch" value="@albumsearch"><br /><br />
+        <button type="submit" class="btn btn-primary" name="Search" id="theSearch">Search</button>
+    </div><br />
+</form>
+
+<div class="col-sm-8">
+    @if (IsPost)
+    {
+        if (albumsearch.IsEmpty())
+        {
+            <p><strong><span style="color:firebrick">Enter album name.</span></strong></p>
+        }
+        else
+        {
+
+            if (queryProducts.Count() == 0)
+            {
+                <p><strong><span style="color:firebrick">Nothing found for search argument.</span></strong></p>
+            }
+            else
+            {
+                // redirect to ProductWebGridDisplay.cshtml
+                Response.Redirect("Exercise04_B.cshtml?cid=" + albumsearch);
+            }
+        }
+    }
+</div>

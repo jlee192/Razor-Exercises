@@ -1,8 +1,42 @@
 ﻿@{
+    // this will be based on ProductWebGridDisplay.cshtml
+
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 04_B");
+
+     var cid = Request.QueryString["cid"];
+    <p>A search was done with the following entry for AlbumId: @cid</p>
+
+    if (string.IsNullOrEmpty(cid))
+    {
+        Response.Redirect("Exercise04_A.cshtml");
+    }
+
+    var db = Database.Open("CHINOOK");
+
+    var prodquery = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
+
+    var prodinfo = db.Query(prodquery, cid);
+
+    var grid = new WebGrid(prodinfo, rowsPerPage: 5);
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+
+<div class="offset-1">
+    <div class="col-11">
+        @grid.GetHtml("table table-bordered table-striped table-hover",
+        mode: WebGridPagerModes.All,
+        lastText: "Last",
+        firstText: "First",
+        columns: grid.Columns(
+            grid.Column(columnName: "Title", header: "Title"),
+            grid.Column(columnName: "ArtistId", header: "ArtistId"),
+            grid.Column(columnName: "ReleaseYear", header: "Year"),
+            grid.Column(columnName: "ReleaseLabel", header: "Label"),
+            grid.Column(header: "", format: @<text><a href="~/ExercisePages/Exercise04_C.cshtml">Edit</a></text>)))
+    </div>
+</div>
+
