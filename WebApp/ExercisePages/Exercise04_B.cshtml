@@ -4,8 +4,8 @@
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 04_B");
 
-     var cid = Request.QueryString["cid"];
-    <p>A search was done with the following entry for AlbumId: @cid</p>
+    var cid = Request.QueryString["cid"];
+    <p>A search was done with the following partial string for entry: @cid</p>
 
     if (string.IsNullOrEmpty(cid))
     {
@@ -13,10 +13,12 @@
     }
 
     var db = Database.Open("CHINOOK");
-
-    var prodquery = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
-
-    var prodinfo = db.Query(prodquery, cid);
+    var partialstring = "%" + cid + "%";
+    var prodquery = @"SELECT AlbumId, Title, "
+                + "ArtistId, ReleaseYear, ReleaseLabel "
+                + "FROM Albums "
+                + "WHERE Title LIKE @0";
+    var prodinfo = db.Query(prodquery, partialstring);
 
     var grid = new WebGrid(prodinfo, rowsPerPage: 5);
 }
@@ -32,6 +34,7 @@
         lastText: "Last",
         firstText: "First",
         columns: grid.Columns(
+            grid.Column(columnName: "AlbumId", header: "AlbumId"),
             grid.Column(columnName: "Title", header: "Title"),
             grid.Column(columnName: "ArtistId", header: "ArtistId"),
             grid.Column(columnName: "ReleaseYear", header: "Year"),

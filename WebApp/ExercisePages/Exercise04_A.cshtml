@@ -7,11 +7,15 @@
     var albumsearch = Request.Form["AlbumSearch"];
 
     var db = Database.Open("CHINOOK");
-    //var partialsearchstring = "%" + albumsearch + "%";
+    var partialsearchstring = "%" + albumsearch + "%";
 
-    var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
-    var queryProducts = db.Query(queryStatement, albumsearch);
-    //var queryProducts = db.Query(queryStatement, partialsearchstring);
+    //string sqlcommand1 = "SELECT ArtistId, Name FROM Artists WHERE Name LIKE @0 ORDER BY Name";
+    //var partialstring = "%" + artistarg + "%";
+    //var results = db.Query(sqlcommand1, partialstring);
+
+    //var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
+    var queryStatement = "SELECT AlbumId, Title FROM Albums WHERE Title LIKE @0 ORDER BY Title";     
+    var queryProducts = db.Query(queryStatement, partialsearchstring);
 }
 
 @section banner {
@@ -20,7 +24,7 @@
 
 <form id="theForm" action="" method="post">
     <div class="col-sm-3">
-        <label id="forAlbumSearch">Album ID</label><br />
+        <label id="forAlbumSearch">Album Name</label><br />
         <input type="text" name="AlbumSearch" value="@albumsearch"><br /><br />
         <button type="submit" class="btn btn-primary" name="Search" id="theSearch">Search</button>
     </div><br />

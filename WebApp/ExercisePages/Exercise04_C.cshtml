@@ -5,23 +5,27 @@
     Page.Title = string.Format("Razor - {0}", "Exercise 04_C");
 
     var pid = Request.QueryString["pid"];
-    if (pid.IsEmpty())
-    {
-        Response.Redirect("Exercise04_B.cshtml");
-    }
+    //if (pid.IsEmpty())
+    //{
+    //    Response.Redirect("Exercise04_A.cshtml");
+    //}
     var albumid = Request.Form["AlbumId"];
     var title = Request.Form["Title"];
     var artistid = Request.Form["ArtistList"];
     var releaseyear = Request.Form["ReleaseYear"];
     var releaselabel = Request.Form["ReleaseLabel"];
+    var thebutton = Request.Form["theButton"];
+
+    var message = "";
 
     // validator controls which execute on the server side
     Validation.Add("Title",
         Validator.Required("Album title is required"),
         Validator.StringLength(160, 1, "Album title is limited to 160 characters"));
 
-    Validation.Add("ArtistList",
-        Validator.Required("Artist must be selected"));
+    //Validation.Add("ArtistId",
+    //    Validator.Integer("Artist ID must be an integer"),
+    //    Validator.Required("Artist must be selected"));
 
     Validation.Add("ReleaseYear",
         Validator.Required("Release year is required"),
@@ -30,11 +34,175 @@
 
     Validation.Add("ReleaseLabel",
         Validator.StringLength(50, 0, "Label is limited to 50 characters."));
+
+    if (!IsPost)
+    {
+        albumid = pid;
+    }
+
     var db = Database.Open("CHINOOK");
 
+    var artistStatement = @"SELECT ArtistId, Name FROM Artists ORDER BY ArtistId";
+    var queryArtist = db.Query(artistStatement);
+
+    var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel " +
+                "FROM Albums WHERE AlbumId = @0";
+    var queryProducts = db.QuerySingle(queryStatement, pid);
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+@if (IsPost)
+{
+    if (thebutton.Equals("backtosearch"))
+    {
+        Response.Redirect("Exercise04_A.cshtml");
+    }
 
+    if (Validation.IsValid())
+    {
+        try
+        {
+            if (thebutton.Equals("update"))
+            {
+                var sqlcommand = "UPDATE Albums SET"
+                                + "Title = @0, "
+                                + "ArtistId = @1, "
+                                + "ReleaseYear = @2, "
+                                + "ReleaseLabel = @3"
+                                + "WHERE AlbumId = @4";
+                var rowsaffected = db.Execute(sqlcommand, title,
+                    artistid.Equals("0") ? null : artistid,
+                    string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
+                    string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
+                if (rowsaffected > 0)
+                {
+                    message = "Album has been UPDATED";
+                }
+                else
+                {
+                    message = "Album NOT found";
+                }
+            }
+            else if (thebutton.Equals("delete"))
+            {
+                var deleteStatement = "DELETE Albums WHERE AlbumId = @0";
+
+                var rows = db.Execute(deleteStatement, albumid);
+                if (rows == 1)
+                {
+                    message = "Album has been DELETED";
+                }
+                else
+                {
+                    message = "Album NOT found";
+                }
+                albumid = "";
+                title = "";
+                artistid = "0";
+                releaseyear = "";
+                releaselabel = "";
+            }
+        }
+        catch (Exception ex)
+        {
+            <div class="col-12 text-center">
+                <p style="color:firebrick; font-size:large">
+                    Processing error: @ex.Message
+                </p>
+            </div>
+        }
+    }
+}
+else
+{
+    albumid = queryProducts.AlbumId.ToString();
+    title = queryProducts.Title;
+    artistid = queryProducts.ArtistId == null ? "0" : queryProducts.ArtistId.ToString();
+    releaseyear = queryProducts.ReleaseYear == null ? "" : queryProducts.ReleaseYear.ToString();
+    releaselabel = queryProducts.ReleaseLabel == null ? "" : queryProducts.ReleaseLabel.ToString();
+}
+@Html.ValidationSummary()
+
+<div class="col-12 text-center">
+    <p style="color:green">
+        @message
+    </p>
+</div>
+
+<form id="theForm" action="" method="post">
+    <div class="row row-cols-2">
+        <div class="col text-right">
+            <label id="lblAlbumId" for="AlbumId">Album ID</label>
+        </div>
+        <div class="col text-left">
+            <input type="text" name="AlbumId" value="@albumid" readonly />
+        </div><br />
+        <div class="col text-right">
+            <label id="lblTitle" for="Title">Title</label>
+        </div>
+        <div class="col text-left">
+            <input type="text" name="Title" value="@title" />
+        </div><br />
+        <div class="col text-right">
+            <label id="lblArtistList" for="ArtistList">Artist</label>
+        </div>
+        <div class="col text-left">
+            <select name="ArtistList">
+                <option value="0">select...</option>
+                @foreach (var acollectionrow in queryArtist)
+                {
+                    if (acollectionrow.ArtistId.ToString() == artistid)
+                    {
+                        <option value="@acollectionrow[0]" selected>@acollectionrow[1]</option>
+                    }
+                    else
+                    {
+                        <option value="@acollectionrow[0]">@acollectionrow[1]</option>
+                    }
+                }
+            </select>
+        </div><br />
+        <div class="col text-right">
+            <label id="lblReleaseYear" for="ReleaseYear">Year</label>
+        </div>
+        <div class="col text-left">
+            <input type="number" name="ReleaseYear" value="@releaseyear" />
+        </div><br />
+        <div class="col text-right">
+            <label id="lblReleaseLabel" for="ReleaseLabel">Label</label>
+        </div>
+        <div class="col text-left">
+            <input type="text" name="UnitPrice" value="@releaselabel" />
+        </div><br />
+    </div>
+    <div class="row">
+        <div class="col-12 text-center">
+            <button type="submit" name="theButton" id="theUpdate" class="btn btn-primary"
+                    value="update">
+                Update
+            </button>&nbsp;&nbsp;&nbsp;
+            <button type="submit" name="theButton" id="theDiscontinue" class="btn btn-primary" formnovalidate
+                    value="discontinue">
+                Discontinue
+            </button>&nbsp;&nbsp;&nbsp;
+            <button type="submit" name="theButton" id="theDelete" class="btn btn-primary" formnovalidate
+                    value="delete">
+                Delete Record
+            </button>&nbsp;&nbsp;&nbsp;
+            <button type="submit" name="theButton" id="theCancel" class="btn btn-primary" formnovalidate
+                    value="backtosearch">
+                Back to Search
+            </button>
+        </div>
+    </div>
+    @* confirmation can be done on a button click using javascript
+        we will ask the user to confirm the discontinuing of a product*@
+    <script type="text/javascript">
+        document.getElementById("theDelete").onclick = ConfirmDelete;
+        function ConfirmDelete() {
+            return confirm("Are you sure you want to DELETE @title?");
+        }
+    </script>
+</form>
