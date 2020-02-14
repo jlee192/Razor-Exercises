@@ -39,7 +39,7 @@
             grid.Column(columnName: "ArtistId", header: "ArtistId"),
             grid.Column(columnName: "ReleaseYear", header: "Year"),
             grid.Column(columnName: "ReleaseLabel", header: "Label"),
-            grid.Column(header: "", format: @<text><a href="~/ExercisePages/Exercise04_C.cshtml">Edit</a></text>)))
+            grid.Column(header: "", format: @<text><a href="~/ExercisePages/Exercise04_C.cshtml?cid=@item.AlbumId">Edit</a></text>)))
     </div>
 </div>
 

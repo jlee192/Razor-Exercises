@@ -9,11 +9,6 @@
     var db = Database.Open("CHINOOK");
     var partialsearchstring = "%" + albumsearch + "%";
 
-    //string sqlcommand1 = "SELECT ArtistId, Name FROM Artists WHERE Name LIKE @0 ORDER BY Name";
-    //var partialstring = "%" + artistarg + "%";
-    //var results = db.Query(sqlcommand1, partialstring);
-
-    //var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
     var queryStatement = "SELECT AlbumId, Title FROM Albums WHERE Title LIKE @0 ORDER BY Title";     
     var queryProducts = db.Query(queryStatement, partialsearchstring);
 }

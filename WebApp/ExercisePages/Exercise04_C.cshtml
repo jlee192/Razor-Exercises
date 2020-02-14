@@ -4,11 +4,11 @@
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 04_C");
 
-    var pid = Request.QueryString["pid"];
-    //if (pid.IsEmpty())
-    //{
-    //    Response.Redirect("Exercise04_A.cshtml");
-    //}
+    var cid = Request.QueryString["cid"];
+    if (cid.IsEmpty())
+    {
+        Response.Redirect("Exercise04_A.cshtml");
+    }
     var albumid = Request.Form["AlbumId"];
     var title = Request.Form["Title"];
     var artistid = Request.Form["ArtistList"];
@@ -37,7 +37,7 @@
 
     if (!IsPost)
     {
-        albumid = pid;
+        albumid = cid;
     }
 
     var db = Database.Open("CHINOOK");
@@ -45,9 +45,8 @@
     var artistStatement = @"SELECT ArtistId, Name FROM Artists ORDER BY ArtistId";
     var queryArtist = db.Query(artistStatement);
 
-    var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel " +
-                "FROM Albums WHERE AlbumId = @0";
-    var queryProducts = db.QuerySingle(queryStatement, pid);
+    var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
+    var queryProducts = db.QuerySingle(queryStatement, cid);
 }
 
 @section banner {
@@ -66,16 +65,19 @@
         {
             if (thebutton.Equals("update"))
             {
-                var sqlcommand = "UPDATE Albums SET"
+                var sqlcommand = "UPDATE Albums SET "
                                 + "Title = @0, "
                                 + "ArtistId = @1, "
                                 + "ReleaseYear = @2, "
-                                + "ReleaseLabel = @3"
+                                + "ReleaseLabel = @3 "
                                 + "WHERE AlbumId = @4";
+
                 var rowsaffected = db.Execute(sqlcommand, title,
                     artistid.Equals("0") ? null : artistid,
                     string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
-                    string.IsNullOrEmpty(releaselabel) ? null : releaselabel);
+                    string.IsNullOrEmpty(releaselabel) ? null : releaselabel,
+                    albumid);
+
                 if (rowsaffected > 0)
                 {
                     message = "Album has been UPDATED";
@@ -117,11 +119,14 @@
 }
 else
 {
-    albumid = queryProducts.AlbumId.ToString();
-    title = queryProducts.Title;
-    artistid = queryProducts.ArtistId == null ? "0" : queryProducts.ArtistId.ToString();
-    releaseyear = queryProducts.ReleaseYear == null ? "" : queryProducts.ReleaseYear.ToString();
-    releaselabel = queryProducts.ReleaseLabel == null ? "" : queryProducts.ReleaseLabel.ToString();
+    if (message != "Album NOT found")
+    {
+        albumid = queryProducts.AlbumId.ToString();
+        title = queryProducts.Title;
+        artistid = queryProducts.ArtistId == null ? "0" : queryProducts.ArtistId.ToString();
+        releaseyear = queryProducts.ReleaseYear == null ? "" : queryProducts.ReleaseYear.ToString();
+        releaselabel = queryProducts.ReleaseLabel == null ? "" : queryProducts.ReleaseLabel.ToString();
+    }
 }
 @Html.ValidationSummary()
 
@@ -174,7 +179,7 @@ else
             <label id="lblReleaseLabel" for="ReleaseLabel">Label</label>
         </div>
         <div class="col text-left">
-            <input type="text" name="UnitPrice" value="@releaselabel" />
+            <input type="text" name="ReleaseLabel" value="@releaselabel" />
         </div><br />
     </div>
     <div class="row">
@@ -183,10 +188,10 @@ else
                     value="update">
                 Update
             </button>&nbsp;&nbsp;&nbsp;
-            <button type="submit" name="theButton" id="theDiscontinue" class="btn btn-primary" formnovalidate
+            @*<button type="submit" name="theButton" id="theDiscontinue" class="btn btn-primary" formnovalidate
                     value="discontinue">
                 Discontinue
-            </button>&nbsp;&nbsp;&nbsp;
+            </button>&nbsp;&nbsp;&nbsp;*@
             <button type="submit" name="theButton" id="theDelete" class="btn btn-primary" formnovalidate
                     value="delete">
                 Delete Record
