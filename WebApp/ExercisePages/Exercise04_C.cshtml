@@ -47,6 +47,11 @@
 
     var queryStatement = "SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel FROM Albums WHERE AlbumId = @0";
     var queryProducts = db.QuerySingle(queryStatement, cid);
+
+    if (queryProducts == null)
+    {
+        Response.Redirect("Exercise04_A.cshtml");
+    }
 }
 
 @section banner {
@@ -74,7 +79,9 @@
 
                 var rowsaffected = db.Execute(sqlcommand, title,
                     artistid.Equals("0") ? null : artistid,
+                    //artistid,
                     string.IsNullOrEmpty(releaseyear) ? null : releaseyear,
+                    //releaseyear,
                     string.IsNullOrEmpty(releaselabel) ? null : releaselabel,
                     albumid);
 
